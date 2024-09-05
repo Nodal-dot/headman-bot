@@ -2,3 +2,6 @@ node_modules
 .env
 .pnpm-lock.yaml
 .idea
+prisma/db
+prisma/db-journal
+prisma/migrations

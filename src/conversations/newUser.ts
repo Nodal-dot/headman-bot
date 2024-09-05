@@ -4,6 +4,7 @@ import {table} from 'utils/table';
 import {Choose, chooseKeyboard, mainKeyboard} from 'keyboard';
 import {addMonths, formatDate, ISOToDate, validateDateRange,} from 'utils/date';
 import {main} from 'template/main';
+import {confirmation} from "template/confirmation";
 
 const prisma = new PrismaClient();
 
@@ -108,12 +109,7 @@ const confirmData = async (
     { username, groupName, startDate, endDate }: Record<string, string>,
 ): Promise<boolean> => {
     await ctx.reply(
-        ctx.t('confirmationTemplate', {
-            username,
-            groupName,
-            startDate,
-            endDate,
-        }),
+        confirmation(ctx,{ username, groupName, startDate, endDate }),
         { reply_markup: chooseKeyboard(ctx) },
     );
     ctx = await conversation.waitFor('callback_query');

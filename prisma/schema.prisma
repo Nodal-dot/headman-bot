@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:db"
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  telegramId   String
+  username     String   @default("User")
+  currentGroup String
+  groups       Group[]
+  language     String   @default("ru")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
+
+  @@unique([telegramId])
+  @@index([telegramId])
+}
+
+model Group {
+  id              Int       @id @default(autoincrement())
+  author          User      @relation(fields: [authorId], references: [id])
+  name            String
+  students        Student[]
+  authorId        Int
+  schoolYearStart DateTime
+  schoolYearEnd   DateTime
+  schoolDays      String    @default("{\"Monday\": true, \"Tuesday\": true, \"Wednesday\": true, \"Thursday\": true, \"Friday\": true, \"Saturday\": false, \"Sunday\": false}")
+  schedule        String    @default("{\"1\": { \"start\": \"8:30\", \"end\": \"10:00\" },\"2\": { \"start\": \"10:10\", \"end\": \"11:40\" },\"3\": { \"start\": \"11:50\", \"end\": \"13:20\" },\"4\": { \"start\": \"13:30\", \"end\": \"15:00\" },\"5\": { \"start\": \"15:10\", \"end\": \"16:40\" }}")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @default(now()) @updatedAt
+
+  @@unique([authorId, name])
+}
+
+model Student {
+  id        Int        @id @default(autoincrement())
+  name      String
+  group     Group      @relation(fields: [groupId], references: [id])
+  groupId   Int
+  registers Register[]
+  createdAt DateTime   @default(now())
+
+  @@unique([name, groupId])
+}
+
+model Register {
+  id        Int      @id @default(autoincrement())
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  studentId Int
+  date      DateTime @default(now())
+  reason    String?
+  isPresent Boolean  @default(false)
+
+  @@unique([studentId, date, reason])
+}
